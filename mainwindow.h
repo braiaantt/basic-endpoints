@@ -83,6 +83,7 @@ private:
     void doDeleteRequest();
 
     void handleJsonDocAsObject(QJsonObject& jsonDoc, QString &values);
+    void setValuesOnTableWidget(QJsonObject& jsonDoc);
 
 };
 #endif // MAINWINDOW_H

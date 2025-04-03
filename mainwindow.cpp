@@ -239,11 +239,6 @@ void MainWindow::getReplyFinished(){
         QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
         QString values;
 
-        if(jsonDoc.isNull()){
-            qDebug()<<"json vacio";
-            return;
-        }
-
         if(jsonDoc.isArray()){
 
             QJsonArray jsonArray = jsonDoc.array();
@@ -254,10 +249,22 @@ void MainWindow::getReplyFinished(){
                 }
             }
 
-        } else {
+        } else if(jsonDoc.isObject()){
+
 
             QJsonObject jsonObject = jsonDoc.object();
-            handleJsonDocAsObject(jsonObject, values);
+            if(jsonObject.contains("detail")){
+
+                ui->textEdit_2->setText(jsonObject["detail"].toString());
+                return;
+
+            }
+            if(ui->pushButtonPUT->isChecked()){
+                setValuesOnTableWidget(jsonObject);
+                return;
+            } else {
+                handleJsonDocAsObject(jsonObject, values);
+            }
 
         }
 
@@ -286,13 +293,13 @@ void MainWindow::handleJsonDocAsObject(QJsonObject& jsonObject, QString &values)
 
         if(dataType == "int"){
 
-            int value = jsonObject[key].toInt();
-            values += QString::number(value) + ", ";
+            int intValue = jsonObject[key].toInt();
+            values.append(QString::number(intValue) + ", ");
 
         } else if(dataType == "str"){
 
-            QString value = jsonObject[key].toString();
-            values += value + ", ";
+            QString stringValue = jsonObject[key].toString();
+            values.append(stringValue + ", ");
 
         }
 
@@ -467,14 +474,10 @@ void MainWindow::on_tableWidgetProperties_itemDoubleClicked(QTableWidgetItem *it
     }
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(ui->tableWidgetProperties->cellWidget(item->row(), item->column()));
 
-    if(idHttpMethod == 0 || idHttpMethod == 3){
-
-        if(lineEdit){
-            connect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::cellPropertyReturnPressed);
-        } else {
-            qDebug()<<"LineEdit no valido";
-        }
-
+    if(lineEdit && item->row() == 0 && idHttpMethod != 1){
+        connect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::cellPropertyReturnPressed);
+    } else {
+        qDebug()<<"LineEdit no valido";
     }
 
 }
@@ -487,6 +490,10 @@ void MainWindow::cellPropertyReturnPressed(){
     QString finalUrl = currentUrl + "=" + pathParameter;
 
     ui->textEditFinalUrl->setText(finalUrl);
+
+    if(ui->pushButtonPUT->isChecked()){
+        doGetRequest();
+    }
 
 }
 
@@ -513,5 +520,36 @@ void MainWindow::on_pushButtonSetBodyRequest_clicked()
 
     QJsonDocument doc(jsonObject);
     requestBody = doc.toJson(QJsonDocument::Compact);
+
+}
+
+void MainWindow::setValuesOnTableWidget(QJsonObject& jsonObject){
+
+    QString objectName = ui->comboBoxClassEndpoints->currentText();
+    Object &object = objectsManager.getObject(objectName);
+    QVector<QPair<QString,QString>> &properties = object.getProperties();
+    QTableWidget *table = ui->tableWidgetProperties;
+
+    for(int i = 1; i<table->rowCount(); i++){
+
+        QString key = properties[i].first;
+        QString dataType = properties[i].second;
+        QString value;
+
+        if(dataType == "int"){
+
+            int intValue = jsonObject[key].toInt();
+            value.append(QString::number(intValue) + ", ");
+
+        } else if(dataType == "str"){
+
+            QString stringValue = jsonObject[key].toString();
+            value.append(stringValue + ", ");
+
+        }
+
+        table->item(i,1)->setText(value);
+
+    }
 
 }

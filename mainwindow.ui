@@ -474,11 +474,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">#labelBodyRequestState{
+color: red;
+}</string>
+    </property>
     <property name="text">
      <string>Sin cuerpo</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>210</x>
