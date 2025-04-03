@@ -123,6 +123,13 @@ void MainWindow::on_pushButtonAddEndpoint_clicked()
 void MainWindow::setEndpointsOnListWidget(){
 
     QString objectName = ui->comboBoxClassEndpoints->currentText();
+
+    //check if some class exist
+    if(objectName == ""){
+        qDebug()<<"Sin clase";
+        return;
+    }
+
     Object &object = objectsManager.getObject(objectName);
     int idHttpMethod = getIdHttpMethod();
     QStringList endpoints = object.getEndpoints(idHttpMethod);
@@ -508,4 +515,3 @@ void MainWindow::on_pushButtonSetBodyRequest_clicked()
     requestBody = doc.toJson(QJsonDocument::Compact);
 
 }
-
