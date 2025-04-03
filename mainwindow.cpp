@@ -487,6 +487,7 @@ void MainWindow::cellPropertyReturnPressed(){
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
     QString currentUrl = ui->textEditFinalUrl->toPlainText();
     QString pathParameter = lineEdit->text();
+    currentUrl = currentUrl.split('=')[0];
     QString finalUrl = currentUrl + "=" + pathParameter;
 
     ui->textEditFinalUrl->setText(finalUrl);
