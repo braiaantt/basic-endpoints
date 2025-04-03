@@ -1,0 +1,4 @@
+# Qt Creator user files
+*.user
+*.user.*
+CMakeLists.txt.user
