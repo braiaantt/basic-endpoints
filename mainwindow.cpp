@@ -95,6 +95,15 @@ bool MainWindow::checkEmptyFields(){
 void MainWindow::buttonGroupClicked(QAbstractButton* button){
 
     setEndpointsOnListWidget();
+    restartUiInformation();
+
+}
+
+void MainWindow::restartUiInformation(){
+
+    ui->labelBodyRequestState->setEnabled(false);
+    ui->labelBodyRequestState->setText("Sin cuerpo");
+    ui->textEdit_2->setText("");
 
 }
 
@@ -521,6 +530,8 @@ void MainWindow::on_pushButtonSetBodyRequest_clicked()
 
     QJsonDocument doc(jsonObject);
     requestBody = doc.toJson(QJsonDocument::Compact);
+    ui->labelBodyRequestState->setEnabled(true);
+    ui->labelBodyRequestState->setText("Con cuerpo");
 
 }
 

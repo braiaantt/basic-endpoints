@@ -430,6 +430,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </column>
    </widget>
    <widget class="QPushButton" name="pushButtonSetBodyRequest">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>210</x>
@@ -461,11 +464,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </property>
    </widget>
    <widget class="QLabel" name="labelBodyRequestState">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>420</x>
       <y>510</y>
-      <width>79</width>
+      <width>82</width>
       <height>22</height>
      </rect>
     </property>
@@ -475,8 +481,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">#labelBodyRequestState{
+     <string notr="true">#labelBodyRequestState::Disabled{
 color: red;
+}
+
+#labelBodyRequestState::Enabled{
+color: green;
 }</string>
     </property>
     <property name="text">

@@ -84,6 +84,7 @@ private:
 
     void handleJsonDocAsObject(QJsonObject& jsonDoc, QString &values);
     void setValuesOnTableWidget(QJsonObject& jsonDoc);
+    void restartUiInformation();
 
 };
 #endif // MAINWINDOW_H
