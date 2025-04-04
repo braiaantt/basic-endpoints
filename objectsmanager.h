@@ -8,6 +8,7 @@ class ObjectsManager
 public:
     ObjectsManager();
     void addObject(Object);
+    int countObjects();
     Object& getObject(QString objName);
 
 private:

@@ -3,6 +3,7 @@
 #include <QUrl>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -84,6 +85,13 @@ void MainWindow::on_pushButtonAddClass_clicked()
 
     ui->comboBoxClassEndpoints->addItem(className);
 
+    if(objectsManager.countObjects() == 1){
+        ui->pushButtonGET->setEnabled(true);
+        ui->pushButtonPOST->setEnabled(true);
+        ui->pushButtonPUT->setEnabled(true);
+        ui->pushButtonDELETE->setEnabled(true);
+    }
+
 }
 
 bool MainWindow::checkEmptyFields(){
@@ -96,6 +104,14 @@ void MainWindow::buttonGroupClicked(QAbstractButton* button){
 
     setEndpointsOnListWidget();
     restartUiInformation();
+
+
+    int idHttpMethod = getIdHttpMethod();
+    if(idHttpMethod == 1 || idHttpMethod == 2){
+        ui->pushButtonSetBodyRequest->setEnabled(true);
+    } else{
+        ui->pushButtonSetBodyRequest->setEnabled(false);
+    }
 
 }
 
@@ -219,6 +235,11 @@ void MainWindow::on_comboBoxProperties_currentTextChanged(const QString &arg1)
 void MainWindow::on_pushButtonSendHttp_clicked()
 {
     int idHttpMethod = getIdHttpMethod();
+
+    if((idHttpMethod == 1 || idHttpMethod == 2) && !ui->labelBodyRequestState->isEnabled()){
+        QMessageBox::warning(this, "Advertencia","Este metodo http necesita de un cuerpo!");
+        return;
+    }
 
     switch(idHttpMethod){
         case 0: doGetRequest(); break;

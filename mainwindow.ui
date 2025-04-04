@@ -431,7 +431,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </widget>
    <widget class="QPushButton" name="pushButtonSetBodyRequest">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -505,6 +505,9 @@ color: green;
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButtonGET">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>GET</string>
        </property>
@@ -521,6 +524,9 @@ color: green;
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonPOST">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>POST</string>
        </property>
@@ -534,6 +540,9 @@ color: green;
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonPUT">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>PUT</string>
        </property>
@@ -547,6 +556,9 @@ color: green;
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonDELETE">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>DELETE</string>
        </property>

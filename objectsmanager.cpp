@@ -11,6 +11,10 @@ void ObjectsManager::addObject(Object newObject){
 
 }
 
+int ObjectsManager::countObjects(){
+    return objects.size();
+}
+
 Object& ObjectsManager::getObject(QString nameObject){
 
     for(int i = 0; i<objects.size(); i++){
