@@ -535,7 +535,12 @@ void MainWindow::on_pushButtonSetBodyRequest_clicked()
     QTableWidget* table = ui->tableWidgetProperties;
     QJsonObject jsonObject;
 
-    for(int i = 0; i<table->rowCount(); i++){
+    int rowCount = table->rowCount();
+    if(rowCount == 0){
+        QMessageBox::warning(this,"Advertencia","No se ha seleccionado ningun endpoint");
+    }
+
+    for(int i = 0; i<rowCount; i++){
 
         QString property = table->item(i,0)->text();
         QString value = table->item(i,1)->text();
