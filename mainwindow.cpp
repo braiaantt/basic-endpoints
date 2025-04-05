@@ -187,13 +187,19 @@ void MainWindow::on_comboBoxClasses_activated(int index)
         setClassOnListWidget(*currentObject);
         setPropertiesOnComboBox(*currentObject);
 
+        ui->lineEditClassName->setEnabled(false);
+        ui->pushButtonAddClass->setEnabled(false);
+
     } else {
 
-        qDebug()<<"cacaa";
         currentObject = objectsManager.getObjectInCreation();
         if(!ui->lineEditClassName->text().isEmpty())currentObject->setName(ui->lineEditClassName->text());
         setClassOnListWidget(*currentObject);
         setPropertiesOnComboBox(*currentObject);
+
+        ui->lineEditClassName->setEnabled(true);
+        ui->pushButtonAddClass->setEnabled(true);
+
     }
 
     ui->lineEditEndpointText->setFocus();
