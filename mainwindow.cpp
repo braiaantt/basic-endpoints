@@ -536,12 +536,9 @@ void MainWindow::on_pushButtonSetBodyRequest_clicked()
     QTableWidget* table = ui->tableWidgetProperties;
     QJsonObject jsonObject;
 
-    int rowCount = table->rowCount();
-    if(rowCount == 0){
-        QMessageBox::warning(this,"Advertencia","No se ha seleccionado ningun endpoint");
-    }
+    if(setBodyRequestError()) return;
 
-    for(int i = 0; i<rowCount; i++){
+    for(int i = 0; i<table->rowCount(); i++){
 
         QString property = table->item(i,0)->text();
         QString value = table->item(i,1)->text();
@@ -559,6 +556,29 @@ void MainWindow::on_pushButtonSetBodyRequest_clicked()
     requestBody = doc.toJson(QJsonDocument::Compact);
     ui->labelBodyRequestState->setEnabled(true);
     ui->labelBodyRequestState->setText("Con cuerpo");
+
+}
+
+bool MainWindow::setBodyRequestError(){
+
+    QTableWidget* table = ui->tableWidgetProperties;
+
+    if(table->rowCount() == 0){
+        QMessageBox::warning(this,"Advertencia","No se ha seleccionado ningun endpoint");
+        return true;
+    }
+
+    for(int i = 0; i<table->rowCount(); i++){
+
+        QTableWidgetItem* item = table->item(i,1);
+        if(item->text() == ""){
+            QMessageBox::warning(this,"Advertencia","Campos vacíos en el tableWidget!");
+            return true;
+        }
+
+    }
+
+    return false;
 
 }
 
