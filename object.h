@@ -13,6 +13,7 @@ public:
     void clearProperties();
     void clearName();
     void addProperty(QPair<QString,QString>);
+    void deleteProperty(QString);
     void addEndpoint(QString endpoint, int httpMethod);
 
     //setters

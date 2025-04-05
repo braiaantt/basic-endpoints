@@ -31,6 +31,7 @@ private slots:
     void putReplyFinished();
     void deleteReplyFinished();
     void cellPropertyReturnPressed();
+    void deletePropertyItem(const QPoint &pos);
 
 
     void on_pushButtonAddProperties_clicked();

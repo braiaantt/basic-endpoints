@@ -17,6 +17,20 @@ void Object::addProperty(QPair<QString,QString> property){
     properties << property;
 }
 
+void Object::deleteProperty(QString _propertyName){
+
+    for(int i = 0; i<properties.size(); i++){
+
+        QPair<QString,QString> property = properties[i];
+        QString propertyName = property.first;
+        if(propertyName == _propertyName){
+            properties.removeAt(i);
+        }
+
+    }
+
+}
+
 void Object::setName(QString _name){
     name = _name;
 }

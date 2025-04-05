@@ -4,6 +4,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 #include <QMessageBox>
+#include <QMenu>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     initButtonsId();
     manager = new QNetworkAccessManager(this);
     connect(ui->buttonGroupHttpMethods, &QButtonGroup::buttonClicked, this, &MainWindow::buttonGroupClicked);
+    connect(ui->listWidgetShowClass, &QListWidget::customContextMenuRequested, this, &MainWindow::deletePropertyItem);
     ui->tableWidgetProperties->hideColumn(2);
     currentObject = objectsManager.createObject();
 
@@ -43,7 +45,7 @@ void MainWindow::on_lineEditClassName_textChanged(const QString &arg1)
 void MainWindow::on_pushButtonAddProperties_clicked()
 {
     if(checkEmptyFields()){
-        qDebug()<<"Campos vacios!";
+        showWarningDialog("Campos vacíos!");
         return;
     }
 
@@ -51,6 +53,10 @@ void MainWindow::on_pushButtonAddProperties_clicked()
     QString dataType = ui->lineEditDataType->text();
     setPropertyOnListWidget(propertyName, dataType);
     currentObject->addProperty(QPair<QString, QString>(propertyName, dataType));
+
+    if(!ui->comboBoxClasses->currentText().isEmpty()){
+        ui->comboBoxProperties->addItem(propertyName);
+    }
 
     qDebug()<<currentObject->getProperties();
 
@@ -66,6 +72,30 @@ void MainWindow::setPropertyOnListWidget(QString& propertyName, QString& dataTyp
     ui->lineEditPropertyName->setText("");
     ui->lineEditDataType->setText("");
     ui->lineEditPropertyName->setFocus();
+
+}
+
+void MainWindow::deletePropertyItem(const QPoint &pos){
+
+    QListWidget* list = ui->listWidgetShowClass;
+    QListWidgetItem* item = list->itemAt(pos);
+    if(item == nullptr) return;
+
+    int itemRow = list->row(item);
+    if(itemRow == 0 || itemRow == list->count()-1)  return;
+
+    QMenu menu(this);
+
+    QAction* deleteItem = menu.addAction("Eliminar propiedad");
+
+    QAction* selectedAction = menu.exec(list->viewport()->mapToGlobal(pos));
+    if(selectedAction == deleteItem){
+        QString propertyName = item->text().split(":").value(0);
+        currentObject->deleteProperty(propertyName);
+        ui->comboBoxProperties->removeItem(itemRow);
+        delete item;
+        list->clearFocus();
+    }
 
 }
 
