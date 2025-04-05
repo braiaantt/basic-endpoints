@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     manager = new QNetworkAccessManager(this);
     connect(ui->buttonGroupHttpMethods, &QButtonGroup::buttonClicked, this, &MainWindow::buttonGroupClicked);
     ui->tableWidgetProperties->hideColumn(2);
+    currentObject = objectsManager.createObject();
 
 }
 
@@ -35,7 +36,7 @@ void MainWindow::on_lineEditClassName_textChanged(const QString &arg1)
 {
     ui->listWidgetShowClass->item(0)->setText(arg1+"{");
     if(arg1.size() == 0){
-        ui->listWidgetShowClass->item(0)->setText("ClassName{");
+        ui->listWidgetShowClass->item(0)->setText(currentObject->getName() + "{");
     }
 }
 
@@ -49,9 +50,9 @@ void MainWindow::on_pushButtonAddProperties_clicked()
     QString propertyName = ui->lineEditPropertyName->text();
     QString dataType = ui->lineEditDataType->text();
     setPropertyOnListWidget(propertyName, dataType);
-    currentObject.addProperty(QPair<QString, QString>(propertyName, dataType));
+    currentObject->addProperty(QPair<QString, QString>(propertyName, dataType));
 
-    qDebug()<<currentObject.getProperties();
+    qDebug()<<currentObject->getProperties();
 
 
 }
@@ -74,13 +75,14 @@ void MainWindow::on_pushButtonAddClass_clicked()
     ui->comboBoxClasses->addItem(className);
     ui->lineEditClassName->setText("");
 
-    currentObject.setName(className);
+    currentObject->setName(className);
     objectsManager.addObject(currentObject);
-    currentObject.clearName();
-    currentObject.clearProperties();
+    currentRequestObject = currentObject;
+
+    currentObject = objectsManager.createObject();
 
     ui->listWidgetShowClass->clear();
-    ui->listWidgetShowClass->addItem("ClassName{");
+    ui->listWidgetShowClass->addItem(currentObject->getName()+"{");
     ui->listWidgetShowClass->addItem("}");
 
     ui->comboBoxClassEndpoints->addItem(className);
@@ -133,17 +135,18 @@ void MainWindow::on_pushButtonAddEndpoint_clicked()
 
     if(objectName != "" && newEndpoint.startsWith(strHttpMethod)){
 
-        Object &object = objectsManager.getObject(objectName);
         int httpMethod = ui->comboBoxHttpMethods->currentIndex();
-        object.addEndpoint(newEndpoint, httpMethod);
+        objectsManager.addEndpointToObject(objectName, newEndpoint, httpMethod);
 
     }
 
     setEndpointsOnListWidget();
-    lineEditEndpoint->setText(ui->comboBoxHttpMethods->currentText());
-    ui->comboBoxClasses->setCurrentIndex(0);
+
     ui->comboBoxProperties->setCurrentIndex(0);
-    ui->lineEditEndpointText->setFocus();
+
+    QString text = ui->comboBoxHttpMethods->currentText() + " /" + ui->comboBoxClasses->currentText();
+    lineEditEndpoint->setText(text);
+    lineEditEndpoint->setFocus();
 
 }
 
@@ -151,15 +154,9 @@ void MainWindow::setEndpointsOnListWidget(){
 
     QString objectName = ui->comboBoxClassEndpoints->currentText();
 
-    //check if some class exist
-    if(objectName == ""){
-        qDebug()<<"Sin clase";
-        return;
-    }
-
-    Object &object = objectsManager.getObject(objectName);
+    currentRequestObject = objectsManager.getObject(objectName);
     int idHttpMethod = getIdHttpMethod();
-    QStringList endpoints = object.getEndpoints(idHttpMethod);
+    QStringList endpoints = currentRequestObject->getEndpoints(idHttpMethod);
 
     ui->listWidgetEndpoints->clear();
     ui->listWidgetEndpoints->addItems(endpoints);
@@ -175,7 +172,6 @@ void MainWindow::on_comboBoxHttpMethods_activated(int index)
 
 void MainWindow::on_comboBoxClasses_activated(int index)
 {
-    if(ui->comboBoxClasses->currentIndex() == 0) return;
 
     QString currentHttpMethod = ui->comboBoxHttpMethods->currentText();
     QString currentClass = ui->comboBoxClasses->currentText();
@@ -183,15 +179,21 @@ void MainWindow::on_comboBoxClasses_activated(int index)
 
     if(!currentClass.isEmpty()){
 
-        QString className = ui->comboBoxClasses->currentText();
-        Object object = objectsManager.getObject(className);
-        setClassOnListWidget(object);
-        setPropertiesOnComboBox(object);
+        QString objectName = ui->comboBoxClasses->currentText();
+
+        objectsManager.setObjectInCreation(currentObject);
+
+        currentObject = objectsManager.getObject(objectName);
+        setClassOnListWidget(*currentObject);
+        setPropertiesOnComboBox(*currentObject);
 
     } else {
-        currentObject.setName("ClassName{");
-        setClassOnListWidget(currentObject);
-        setPropertiesOnComboBox(currentObject);
+
+        qDebug()<<"cacaa";
+        currentObject = objectsManager.getObjectInCreation();
+        if(!ui->lineEditClassName->text().isEmpty())currentObject->setName(ui->lineEditClassName->text());
+        setClassOnListWidget(*currentObject);
+        setPropertiesOnComboBox(*currentObject);
     }
 
     ui->lineEditEndpointText->setFocus();
@@ -318,9 +320,7 @@ void MainWindow::getReplyFinished(){
 
 void MainWindow::handleJsonDocAsObject(QJsonObject& jsonObject, QString &values){
 
-    QString objectName = ui->comboBoxClassEndpoints->currentText();
-    Object &object = objectsManager.getObject(objectName);
-    QVector<QPair<QString,QString>> &properties = object.getProperties();
+    QVector<QPair<QString,QString>> &properties = currentRequestObject->getProperties();
 
     for(const QPair<QString, QString> &property : properties){
 
@@ -432,9 +432,7 @@ void MainWindow::on_listWidgetEndpoints_itemPressed(QListWidgetItem *item)
 
 void MainWindow::setPropertiesOnTableWidget(){
 
-    QString objectName = ui->comboBoxClassEndpoints->currentText();
-    Object &object = objectsManager.getObject(objectName);
-    QVector<QPair<QString,QString>> &properties = object.getProperties();
+    QVector<QPair<QString,QString>> &properties = currentRequestObject->getProperties();
     QVector<QPair<QString,QString>> filteredProperties = getFilteredProperties(properties);
 
     QTableWidget* table = ui->tableWidgetProperties;
@@ -495,6 +493,7 @@ void MainWindow::on_comboBoxClassEndpoints_currentTextChanged(const QString &arg
 
 void MainWindow::on_comboBoxClassEndpoints_activated(int index)
 {
+    currentRequestObject = objectsManager.getObject(ui->comboBoxClassEndpoints->currentText());
     setEndpointsOnListWidget();
     ui->tableWidgetProperties->setRowCount(0);
 }
@@ -589,9 +588,7 @@ bool MainWindow::setBodyRequestError(){
 
 void MainWindow::setValuesOnTableWidget(QJsonObject& jsonObject){
 
-    QString objectName = ui->comboBoxClassEndpoints->currentText();
-    Object &object = objectsManager.getObject(objectName);
-    QVector<QPair<QString,QString>> &properties = object.getProperties();
+    QVector<QPair<QString,QString>> &properties = currentRequestObject->getProperties();
     QTableWidget *table = ui->tableWidgetProperties;
 
     for(int i = 1; i<table->rowCount(); i++){

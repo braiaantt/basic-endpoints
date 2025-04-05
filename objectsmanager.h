@@ -7,12 +7,21 @@ class ObjectsManager
 {
 public:
     ObjectsManager();
-    void addObject(Object);
     int countObjects();
-    Object& getObject(QString objName);
+    void addObject(std::shared_ptr<Object>);
+    void addEndpointToObject(QString objectName, QString newEndpoint, int httpMethod);
+    std::shared_ptr<Object> createObject();
+
+    //getters
+    std::shared_ptr<Object> getObject(QString objectName);
+    std::shared_ptr<Object> getObjectInCreation();
+
+    //setters
+    void setObjectInCreation(std::shared_ptr<Object>);
 
 private:
-    QVector<Object> objects;
+    QVector<std::shared_ptr<Object>> objects;
+    std::shared_ptr<Object> objectInCreation;
 
 };
 

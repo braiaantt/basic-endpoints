@@ -64,7 +64,8 @@ private:
     QNetworkAccessManager* manager;
     Endpoints endpoints;
     ObjectsManager objectsManager;
-    Object currentObject;
+    std::shared_ptr<Object> currentObject;
+    std::shared_ptr<Object> currentRequestObject;
     QByteArray requestBody;
 
     void setClassOnListWidget(Object &);

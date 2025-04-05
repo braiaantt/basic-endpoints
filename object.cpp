@@ -2,7 +2,7 @@
 
 Object::Object()
 {
-    name = "";
+    name = "ClassName";
 }
 
 void Object::clearName(){
