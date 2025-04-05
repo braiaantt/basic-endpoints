@@ -87,6 +87,7 @@ private:
     void setValuesOnTableWidget(QJsonObject& jsonDoc);
     void restartUiInformation();
     bool setBodyRequestError();
+    void showWarningDialog(QString);
 
 };
 #endif // MAINWINDOW_H

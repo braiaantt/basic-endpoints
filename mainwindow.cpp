@@ -72,6 +72,12 @@ void MainWindow::setPropertyOnListWidget(QString& propertyName, QString& dataTyp
 void MainWindow::on_pushButtonAddClass_clicked()
 {
     QString className = ui->lineEditClassName->text();
+
+    if(className == ""){
+        showWarningDialog("La clase debe tener un nombre!");
+        return;
+    }
+
     ui->comboBoxClasses->addItem(className);
     ui->lineEditClassName->setText("");
 
@@ -251,7 +257,7 @@ void MainWindow::on_pushButtonSendHttp_clicked()
     int idHttpMethod = getIdHttpMethod();
 
     if((idHttpMethod == 1 || idHttpMethod == 2) && !ui->labelBodyRequestState->isEnabled()){
-        QMessageBox::warning(this, "Advertencia","Este metodo http necesita de un cuerpo!");
+        showWarningDialog("Este metodo http necesita de un cuerpo!");
         return;
     }
 
@@ -574,7 +580,7 @@ bool MainWindow::setBodyRequestError(){
     QTableWidget* table = ui->tableWidgetProperties;
 
     if(table->rowCount() == 0){
-        QMessageBox::warning(this,"Advertencia","No se ha seleccionado ningun endpoint");
+        showWarningDialog("No se ha seleccionado ningun endpoint");
         return true;
     }
 
@@ -582,7 +588,7 @@ bool MainWindow::setBodyRequestError(){
 
         QTableWidgetItem* item = table->item(i,1);
         if(item->text() == ""){
-            QMessageBox::warning(this,"Advertencia","Campos vacíos en el tableWidget!");
+            showWarningDialog("Campos vacíos en el tableWidget!");
             return true;
         }
 
@@ -618,5 +624,11 @@ void MainWindow::setValuesOnTableWidget(QJsonObject& jsonObject){
         table->item(i,1)->setText(value);
 
     }
+
+}
+
+void MainWindow::showWarningDialog(QString warningText){
+
+    QMessageBox::warning(this, "Advertencia", warningText);
 
 }
