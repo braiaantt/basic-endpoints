@@ -572,6 +572,32 @@ color: green;
      </item>
     </layout>
    </widget>
+   <zorder>pushButtonSetBodyRequest</zorder>
+   <zorder>listWidgetEndpoints</zorder>
+   <zorder>textEdit_2</zorder>
+   <zorder>pushButtonSendHttp</zorder>
+   <zorder>label</zorder>
+   <zorder>lineEditClassName</zorder>
+   <zorder>lineEditPropertyName</zorder>
+   <zorder>lineEditDataType</zorder>
+   <zorder>pushButtonAddProperties</zorder>
+   <zorder>listWidgetShowClass</zorder>
+   <zorder>label_2</zorder>
+   <zorder>comboBoxHttpMethods</zorder>
+   <zorder>comboBoxClasses</zorder>
+   <zorder>pushButtonAddClass</zorder>
+   <zorder>pushButtonAddEndpoint</zorder>
+   <zorder>lineEditEndpointText</zorder>
+   <zorder>label_3</zorder>
+   <zorder>lineEditUrl</zorder>
+   <zorder>comboBoxProperties</zorder>
+   <zorder>label_4</zorder>
+   <zorder>textEditFinalUrl</zorder>
+   <zorder>comboBoxClassEndpoints</zorder>
+   <zorder>tableWidgetProperties</zorder>
+   <zorder>label_5</zorder>
+   <zorder>labelBodyRequestState</zorder>
+   <zorder>layoutWidget</zorder>
   </widget>
  </widget>
  <resources/>

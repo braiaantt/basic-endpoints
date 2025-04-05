@@ -120,6 +120,7 @@ void MainWindow::restartUiInformation(){
     ui->labelBodyRequestState->setEnabled(false);
     ui->labelBodyRequestState->setText("Sin cuerpo");
     ui->textEdit_2->setText("");
+    ui->tableWidgetProperties->setRowCount(0);
 
 }
 
