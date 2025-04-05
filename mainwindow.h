@@ -39,17 +39,11 @@ private slots:
 
     void on_pushButtonAddEndpoint_clicked();
 
-    void on_comboBoxHttpMethods_currentTextChanged(const QString &arg1);
-
     void on_pushButtonSendHttp_clicked();
 
     void on_pushButtonAddClass_clicked();
 
     void on_listWidgetEndpoints_itemPressed(QListWidgetItem *item);
-
-    void on_comboBoxClasses_currentTextChanged(const QString &arg1);
-
-    void on_comboBoxProperties_currentTextChanged(const QString &arg1);
 
     void on_comboBoxClassEndpoints_currentTextChanged(const QString &arg1);
 
@@ -58,6 +52,12 @@ private slots:
     void on_tableWidgetProperties_itemDoubleClicked(QTableWidgetItem *item);
 
     void on_pushButtonSetBodyRequest_clicked();
+
+    void on_comboBoxHttpMethods_activated(int index);
+
+    void on_comboBoxClasses_activated(int index);
+
+    void on_comboBoxProperties_activated(int index);
 
 private:
     Ui::MainWindow *ui;

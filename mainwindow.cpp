@@ -141,6 +141,7 @@ void MainWindow::on_pushButtonAddEndpoint_clicked()
 
     setEndpointsOnListWidget();
     lineEditEndpoint->setText(ui->comboBoxHttpMethods->currentText());
+    ui->comboBoxClasses->setCurrentIndex(0);
     ui->comboBoxProperties->setCurrentIndex(0);
     ui->lineEditEndpointText->setFocus();
 
@@ -165,19 +166,22 @@ void MainWindow::setEndpointsOnListWidget(){
 
 }
 
-void MainWindow::on_comboBoxHttpMethods_currentTextChanged(const QString &arg1)
+void MainWindow::on_comboBoxHttpMethods_activated(int index)
 {
-    ui->lineEditEndpointText->setText(arg1);
+    ui->lineEditEndpointText->setText(ui->comboBoxHttpMethods->currentText());
     ui->comboBoxClasses->setCurrentIndex(0);
     ui->comboBoxProperties->setCurrentIndex(0);
 }
 
-void MainWindow::on_comboBoxClasses_currentTextChanged(const QString &arg1)
+void MainWindow::on_comboBoxClasses_activated(int index)
 {
-    QString currentHttpMethod = ui->comboBoxHttpMethods->currentText();
-    ui->lineEditEndpointText->setText(currentHttpMethod + " /" + arg1);
+    if(ui->comboBoxClasses->currentIndex() == 0) return;
 
-    if(!arg1.isEmpty()){
+    QString currentHttpMethod = ui->comboBoxHttpMethods->currentText();
+    QString currentClass = ui->comboBoxClasses->currentText();
+    ui->lineEditEndpointText->setText(currentHttpMethod + " /" + currentClass);
+
+    if(!currentClass.isEmpty()){
 
         QString className = ui->comboBoxClasses->currentText();
         Object object = objectsManager.getObject(className);
@@ -191,7 +195,15 @@ void MainWindow::on_comboBoxClasses_currentTextChanged(const QString &arg1)
     }
 
     ui->lineEditEndpointText->setFocus();
+}
 
+void MainWindow::on_comboBoxProperties_activated(int index)
+{
+    if(ui->comboBoxProperties->currentIndex() == 0) return;
+    QString currentHttpMethod = ui->comboBoxHttpMethods->currentText();
+    QString currentClassName = ui->comboBoxClasses->currentText();
+    QString currentProperty = ui->comboBoxProperties->currentText();
+    ui->lineEditEndpointText->setText(currentHttpMethod + " /" + currentClassName + "/" + currentProperty);
 }
 
 void MainWindow::setPropertiesOnComboBox(Object &object){
@@ -224,13 +236,6 @@ void MainWindow::setClassOnListWidget(Object &object){
 
     list->addItem("}");
 
-}
-
-void MainWindow::on_comboBoxProperties_currentTextChanged(const QString &arg1)
-{
-    QString currentHttpMethod = ui->comboBoxHttpMethods->currentText();
-    QString currentClassName = ui->comboBoxClasses->currentText();
-    ui->lineEditEndpointText->setText(currentHttpMethod + " /" + currentClassName + "/" + arg1);
 }
 
 void MainWindow::on_pushButtonSendHttp_clicked()
