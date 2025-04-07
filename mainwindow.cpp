@@ -5,6 +5,7 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QMessageBox>
 #include <QMenu>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,6 +18,22 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->listWidgetShowClass, &QListWidget::customContextMenuRequested, this, &MainWindow::deletePropertyItem);
     ui->tableWidgetProperties->hideColumn(2);
     currentObject = objectsManager.createObject();
+
+    QPair<QString,QString> id("id","int");
+    QPair<QString,QString> name("name","str");
+    QPair<QString,QString> last_name("last_name","str");
+    QPair<QString,QString> age("age","int");
+
+    currentObject->addProperty(id);
+    currentObject->addProperty(name);
+    currentObject->addProperty(last_name);
+    currentObject->addProperty(age);
+
+    ui->lineEditClassName->setText("user");
+
+    ui->pushButtonAddClass->click();
+
+    ui->comboBoxHttpMethods->setCurrentIndex(2);
 
 }
 
@@ -532,49 +549,12 @@ void MainWindow::on_comboBoxClassEndpoints_currentTextChanged(const QString &arg
 {
 }
 
-
 void MainWindow::on_comboBoxClassEndpoints_activated(int index)
 {
     currentRequestObject = objectsManager.getObject(ui->comboBoxClassEndpoints->currentText());
     setEndpointsOnListWidget();
     ui->tableWidgetProperties->setRowCount(0);
 }
-
-
-void MainWindow::on_tableWidgetProperties_itemDoubleClicked(QTableWidgetItem *item)
-{
-    int idHttpMethod = getIdHttpMethod();
-    if(item->column() == 1){
-        ui->tableWidgetProperties->editItem(item);
-    } else {
-        return;
-    }
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(ui->tableWidgetProperties->cellWidget(item->row(), item->column()));
-
-    if(lineEdit && item->row() == 0 && idHttpMethod != 1){
-        connect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::cellPropertyReturnPressed);
-    } else {
-        qDebug()<<"LineEdit no valido";
-    }
-
-}
-
-void MainWindow::cellPropertyReturnPressed(){
-
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
-    QString currentUrl = ui->textEditFinalUrl->toPlainText();
-    QString pathParameter = lineEdit->text();
-    currentUrl = currentUrl.split('=')[0];
-    QString finalUrl = currentUrl + "=" + pathParameter;
-
-    ui->textEditFinalUrl->setText(finalUrl);
-
-    if(ui->pushButtonPUT->isChecked()){
-        doGetRequest();
-    }
-
-}
-
 
 void MainWindow::on_pushButtonSetBodyRequest_clicked()
 {
@@ -660,5 +640,58 @@ void MainWindow::setValuesOnTableWidget(QJsonObject& jsonObject){
 void MainWindow::showWarningDialog(QString warningText){
 
     QMessageBox::warning(this, "Advertencia", warningText);
+
+}
+
+void MainWindow::on_tableWidgetProperties_itemDoubleClicked(QTableWidgetItem *item)
+{
+    if(item->column() == 1){
+        ui->tableWidgetProperties->setCurrentCell(item->row(),item->column());
+        ui->tableWidgetProperties->editItem(item);
+        connectLineEditReturnPressedSignal(item->row());
+    }
+}
+
+void MainWindow::connectLineEditReturnPressedSignal(int row){
+
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(ui->tableWidgetProperties->cellWidget(row, 1));
+
+    if(lineEdit){
+        disconnect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::itemLineEditReturnPressed);
+        connect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::itemLineEditReturnPressed);
+        qDebug()<<"conectado";
+    }
+
+}
+
+void MainWindow::itemLineEditReturnPressed(){
+
+    int newRow = ui->tableWidgetProperties->currentRow() + 1;
+
+
+    QTimer::singleShot(0,this,[this, newRow](){
+
+        if(ui->tableWidgetProperties->currentRow() == 0 && !ui->pushButtonPOST->isChecked()){
+            QString value = ui->tableWidgetProperties->item(newRow-1, 1)->text();
+            QString url = ui->textEditFinalUrl->toPlainText();
+            url = url.split("=").value(0);
+            url.append("="+value);
+            ui->textEditFinalUrl->setText(url);
+        }
+
+    });
+
+    if(newRow < ui->tableWidgetProperties->rowCount()){
+
+        QTimer::singleShot(0, this, [this, newRow](){
+
+            ui->tableWidgetProperties->setCurrentCell(newRow,1);
+            ui->tableWidgetProperties->editItem(ui->tableWidgetProperties->item(newRow,1));
+
+            connectLineEditReturnPressedSignal(newRow);
+
+        });
+
+    }
 
 }

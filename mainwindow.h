@@ -30,9 +30,8 @@ private slots:
     void postReplyFinished();
     void putReplyFinished();
     void deleteReplyFinished();
-    void cellPropertyReturnPressed();
     void deletePropertyItem(const QPoint &pos);
-
+    void itemLineEditReturnPressed();
 
     void on_pushButtonAddProperties_clicked();
 
@@ -50,8 +49,6 @@ private slots:
 
     void on_comboBoxClassEndpoints_activated(int index);
 
-    void on_tableWidgetProperties_itemDoubleClicked(QTableWidgetItem *item);
-
     void on_pushButtonSetBodyRequest_clicked();
 
     void on_comboBoxHttpMethods_activated(int index);
@@ -59,6 +56,8 @@ private slots:
     void on_comboBoxClasses_activated(int index);
 
     void on_comboBoxProperties_activated(int index);
+
+    void on_tableWidgetProperties_itemDoubleClicked(QTableWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;
@@ -89,6 +88,7 @@ private:
     void restartUiInformation();
     bool setBodyRequestError();
     void showWarningDialog(QString);
+    void connectLineEditReturnPressedSignal(int row);
 
 };
 #endif // MAINWINDOW_H
