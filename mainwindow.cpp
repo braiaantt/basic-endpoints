@@ -19,22 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidgetProperties->hideColumn(2);
     currentObject = objectsManager.createObject();
 
-    QPair<QString,QString> id("id","int");
-    QPair<QString,QString> name("name","str");
-    QPair<QString,QString> last_name("last_name","str");
-    QPair<QString,QString> age("age","int");
-
-    currentObject->addProperty(id);
-    currentObject->addProperty(name);
-    currentObject->addProperty(last_name);
-    currentObject->addProperty(age);
-
-    ui->lineEditClassName->setText("user");
-
-    ui->pushButtonAddClass->click();
-
-    ui->comboBoxHttpMethods->setCurrentIndex(2);
-
 }
 
 MainWindow::~MainWindow()
@@ -74,9 +58,6 @@ void MainWindow::on_pushButtonAddProperties_clicked()
     if(!ui->comboBoxClasses->currentText().isEmpty()){
         ui->comboBoxProperties->addItem(propertyName);
     }
-
-    qDebug()<<currentObject->getProperties();
-
 
 }
 void MainWindow::setPropertyOnListWidget(QString& propertyName, QString& dataType){
@@ -320,7 +301,6 @@ void MainWindow::on_pushButtonSendHttp_clicked()
 void MainWindow::doGetRequest(){
 
     QUrl url = ui->textEditFinalUrl->toPlainText();
-    qDebug()<<"url: "<<makeUrl();
     QNetworkRequest request(url);
     QNetworkReply* reply = manager->get(request);
     connect(reply, &QNetworkReply::finished, this, &MainWindow::getReplyFinished);
@@ -659,7 +639,6 @@ void MainWindow::connectLineEditReturnPressedSignal(int row){
     if(lineEdit){
         disconnect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::itemLineEditReturnPressed);
         connect(lineEdit, &QLineEdit::returnPressed, this, &MainWindow::itemLineEditReturnPressed);
-        qDebug()<<"conectado";
     }
 
 }
