@@ -39,6 +39,7 @@ void MainWindow::on_lineEditClassName_textChanged(const QString &arg1)
 {
     ui->listWidgetShowClass->item(0)->setText(arg1+"{");
     if(arg1.size() == 0){
+        currentObject->setName("ClassName");
         ui->listWidgetShowClass->item(0)->setText(currentObject->getName() + "{");
     }
 }
@@ -650,10 +651,11 @@ void MainWindow::itemLineEditReturnPressed(){
     QTimer::singleShot(0,this,[this, newRow](){
 
         if(ui->tableWidgetProperties->currentRow() == 0 && !ui->pushButtonPOST->isChecked()){
+            QString key = ui->tableWidgetProperties->item(newRow-1, 0)->text();
             QString value = ui->tableWidgetProperties->item(newRow-1, 1)->text();
-            QString url = ui->textEditFinalUrl->toPlainText();
-            url = url.split("=").value(0);
-            url.append("="+value);
+            QString url = makeUrl();
+            url = url.split(key).value(0);
+            url.append(value);
             ui->textEditFinalUrl->setText(url);
         }
 
