@@ -114,6 +114,7 @@ void MainWindow::on_pushButtonAddClass_clicked()
     currentRequestObject = currentObject;
 
     currentObject = objectsManager.createObject();
+    objectsManager.setObjectInCreation(currentObject);
 
     ui->listWidgetShowClass->clear();
     ui->listWidgetShowClass->addItem(currentObject->getName()+"{");
@@ -214,8 +215,6 @@ void MainWindow::on_comboBoxClasses_activated(int index)
     if(!currentClass.isEmpty()){
 
         QString objectName = ui->comboBoxClasses->currentText();
-
-        objectsManager.setObjectInCreation(currentObject);
 
         currentObject = objectsManager.getObject(objectName);
         setClassOnListWidget(*currentObject);
