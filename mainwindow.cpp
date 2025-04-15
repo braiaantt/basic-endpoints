@@ -310,50 +310,49 @@ void MainWindow::getReplyFinished(){
 
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 
-    if(reply->error() == QNetworkReply::NoError){
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QByteArray response = reply->readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+    QString values;
 
-        QByteArray response = reply->readAll();
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
-        QString values;
+    if(statusCode == 200){
 
-        if(jsonDoc.isArray()){
+        QJsonObject object = jsonDoc.object();
+        bool success = object["success"].toBool();
 
-            QJsonArray jsonArray = jsonDoc.array();
-            for(const QJsonValue& value : jsonArray){
-                if(value.isObject()){
-                    QJsonObject jsonObject = value.toObject();
-                    handleJsonDocAsObject(jsonObject, values);
+        if(success){
+
+            if(object["data"].isArray()){
+                QJsonArray array = object["data"].toArray();
+                for(int i = 0; i<array.size(); i++){
+
+                    QJsonObject data = array[i].toObject();
+                    handleJsonDocAsObject(data, values);
                 }
-            }
 
-        } else if(jsonDoc.isObject()){
-
-
-            QJsonObject jsonObject = jsonDoc.object();
-            if(jsonObject.contains("detail")){
-
-                ui->textEdit_2->setText(jsonObject["detail"].toString());
-                return;
-
-            }
-            if(ui->pushButtonPUT->isChecked()){
-                setValuesOnTableWidget(jsonObject);
-                return;
             } else {
-                handleJsonDocAsObject(jsonObject, values);
+
+                QJsonObject data = object["data"].toObject();
+                handleJsonDocAsObject(data, values);
+
             }
+
+        } else {
+
+            values = object["message"].toString();
 
         }
 
         ui->textEdit_2->setText(values);
 
-    } else {
+    } else if (statusCode == 404){
 
-        QByteArray response = reply->readAll();
-        QString textResponse = QString::fromUtf8(response);
-        ui->textEdit_2->setText(textResponse);
+        QJsonObject object = jsonDoc.object();
+        values = object["detail"].toString();
 
     }
+
+    ui->textEdit_2->setText(values);
 
 }
 
