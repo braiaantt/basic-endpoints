@@ -309,45 +309,38 @@ void MainWindow::doGetRequest(){
 void MainWindow::getReplyFinished(){
 
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QByteArray response = reply->readAll();
     QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
     QString values;
 
-    if(statusCode == 200){
+    QJsonObject object = jsonDoc.object();
+    bool success = object["success"].toBool();
 
-        QJsonObject object = jsonDoc.object();
-        bool success = object["success"].toBool();
+    if(success){
 
-        if(success){
+        if(object["data"].isArray()){
+            QJsonArray array = object["data"].toArray();
+            for(int i = 0; i<array.size(); i++){
 
-            if(object["data"].isArray()){
-                QJsonArray array = object["data"].toArray();
-                for(int i = 0; i<array.size(); i++){
-
-                    QJsonObject data = array[i].toObject();
-                    handleJsonDocAsObject(data, values);
-                }
-
-            } else {
-
-                QJsonObject data = object["data"].toObject();
+                QJsonObject data = array[i].toObject();
                 handleJsonDocAsObject(data, values);
-
             }
 
         } else {
 
-            values = object["message"].toString();
+            QJsonObject data = object["data"].toObject();
+
+            if(ui->pushButtonPUT->isChecked()){
+                setValuesOnTableWidget(data);
+                return;
+            } else {
+                handleJsonDocAsObject(data, values);
+            }
 
         }
 
-        ui->textEdit_2->setText(values);
+    } else {
 
-    } else if (statusCode == 404){
-
-        QJsonObject object = jsonDoc.object();
         values = object["detail"].toString();
 
     }
@@ -395,9 +388,11 @@ void MainWindow::doPostRequest(){
 void MainWindow::postReplyFinished(){
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-
     QByteArray response = reply->readAll();
-    QString textResponse = QString::fromUtf8(response);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+    QJsonObject jsonObject = jsonDoc.object();
+
+    QString textResponse = jsonObject["message"].toString();
     ui->textEdit_2->setText(textResponse);
 
 }
@@ -414,10 +409,13 @@ void MainWindow::doPutRequest(){
 void MainWindow::putReplyFinished(){
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-
     QByteArray response = reply->readAll();
-    QString textResponse = QString::fromUtf8(response);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+    QJsonObject jsonObject = jsonDoc.object();
+    QString textResponse = jsonDoc["message"].toString();
+
     ui->textEdit_2->setText(textResponse);
+
 
 }
 
@@ -433,14 +431,13 @@ void MainWindow::doDeleteRequest(){
 void MainWindow::deleteReplyFinished(){
 
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QByteArray response = reply->readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+    QJsonObject jsonObject = jsonDoc.object();
 
-    if(reply->error() == QNetworkReply::NoError){
+    QString textResponse = jsonObject["message"].toString();
+    ui->textEdit_2->setText(textResponse);
 
-        QByteArray response = reply->readAll();
-        QString textResponse = QString::fromUtf8(response);
-        ui->textEdit_2->setText(textResponse);
-
-    }
 
 }
 
@@ -649,7 +646,7 @@ void MainWindow::itemLineEditReturnPressed(){
 
     QTimer::singleShot(0,this,[this, newRow](){
 
-        if(ui->tableWidgetProperties->currentRow() == 0 && !ui->pushButtonPOST->isChecked()){
+        if(ui->tableWidgetProperties->currentRow() == 0 && !ui->pushButtonPOST->isChecked() && !ui->pushButtonPUT->isChecked()){
             QString key = ui->tableWidgetProperties->item(newRow-1, 0)->text();
             QString value = ui->tableWidgetProperties->item(newRow-1, 1)->text();
             QString url = makeUrl();
