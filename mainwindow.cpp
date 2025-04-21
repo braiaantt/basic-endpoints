@@ -341,7 +341,7 @@ void MainWindow::getReplyFinished(){
 
     } else {
 
-        values = object["detail"].toString();
+        values = object["message"].toString();
 
     }
 
